@@ -13,38 +13,25 @@
 #include "wolf3d.h"
 #include <stdio.h>
 
-int main(int argc, char *args[])
+bool init_window(bool fullscreen, const char *title, SDL_Window *window, SDL_Renderer* renderer)
 {
-	SDL_Window *window;
-	SDL_Renderer* renderer;
-	window = init_window(false, "Wolf3D");
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (renderer == NULL)
-		put_error("Renderer could not be created! SDL_Error: ");
-	SDL_RenderPresent(renderer);
-	sleep();
-	end(renderer, window);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-	return 0;
-}
-
-SDL_Window *init_window(bool fullscreen, const char *title)
-{
-	SDL_Window *window = NULL;
 	SDL_Surface *screenSurface = NULL;
+	bool success;
 
+	success = true;
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		put_error("SDL could not be initialized! SDL_Error: ");
-	}
+		success = put_error("SDL could not be initialized! SDL_Error: ");
 	else
 	{
 		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
 								  SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
 								  SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (window == NULL)
-			put_error("Window could not be created! SDL_Error: ");
+			success = put_error("Window could not be created! SDL_Error: ");
+		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+		if (renderer == NULL)
+			success = put_error("Renderer could not be created! SDL_Error: ");
+		SDL_RenderPresent(renderer);
 		// else
 		// {
 		// 	screenSurface = SDL_GetWindowSurface(window);
@@ -54,38 +41,67 @@ SDL_Window *init_window(bool fullscreen, const char *title)
 		// 	SDL_Delay(2000);
 		// }
 	}
-	return (window);
+	return (success);
 }
 
-void put_error(char *str)
+bool read()
 {
-	perror(str);
-	perror(SDL_GetError());
-	perror("\n");
-	SDL_Quit();
-	exit(-1);
+	return (true);
 }
 
-// pauses the program until you press a key
-void sleep()
+void update()
 {
-	SDL_Event event = {0};
-  bool done = false;
-  while(done == false)
-  {
-    while(SDL_PollEvent(&event))
-    {
-      if (event.type == SDL_QUIT) return ;
-      if (event.type == SDL_KEYDOWN) done = true;
-    }
-    SDL_Delay(5);
-  }
+	while(!done(true, true));
+	//init variables
+	//initial calculations
+	//DDA
+
 }
 
-void end(SDL_Renderer *renderer, SDL_Window *window)
+void end(SDL_Window *window, SDL_Renderer *renderer)
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+	// ft_putendl("Program quit successfully.");
 	exit(1);
+}
+
+int main(int argc, char *args[])
+{
+	SDL_Window *window;
+	SDL_Renderer* renderer;
+
+	if (read() && init_window(false, "Wolf3D", window, renderer))
+		update();
+	end(window, renderer);
+	return 0;
+}
+
+bool put_error(char *str)
+{
+	perror(str);
+	perror(SDL_GetError());
+	perror("\n");
+	return (false);
+}
+
+bool keyDown(SDL_Scancode key)
+{
+    return (SDL_GetKeyboardState(NULL)[key] != 0);
+}
+
+//Returns 1 if you close the window or press the escape key.
+//Also handles everything thats needed per frame.
+bool done(bool quit_if_esc, bool delay)
+{
+	SDL_Event event;
+	if (delay) SDL_Delay(5); //So it consumes less processing power
+   
+	while (SDL_PollEvent(&event))
+	{
+		if (event.type == SDL_QUIT) return true;
+		if (quit_if_esc && keyDown(SDL_SCANCODE_ESCAPE))return true;
+	}
+	return false;
 }

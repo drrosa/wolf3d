@@ -1,14 +1,39 @@
 #ifndef WOLF3D_H
 
 # define WOLF3D_H
-# define SCREEN_WIDTH 640
-# define SCREEN_HEIGHT 480
+# define SCREEN_WIDTH 1280
+# define SCREEN_HEIGHT 1024
 
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
 #define mapWidth 24
 #define mapHeight 24
+
+typedef struct s_player
+{
+  double pos_x;
+  double pos_y;
+  double dir_x;
+  double dir_y;
+  double plane_x;
+  double plane_y;
+}              t_player;
+
+typedef struct s_ray
+{
+  double camera_x;
+  double dir_x;
+  double dir_y;
+  int map_x;
+  int map_y;
+  double side_dist_x;
+  double side_dist_y;
+  double delta_dist_x;
+  double delta_dist_y;
+  int step_x;
+  int step_y;
+}              t_ray;
 
 int worldMap[mapWidth][mapHeight]=
 {
@@ -38,9 +63,7 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-SDL_Window *init_window(bool fullscreen, const char *text);
-void put_error(char *str);
-void sleep();
-void end(SDL_Renderer *renderer, SDL_Window *window);
+bool put_error(char *str);
+bool done(bool quit_if_esc, bool delay);
 
 #endif
