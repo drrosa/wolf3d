@@ -10,7 +10,7 @@ rayflat:
 	g++ raycaster_flat.cpp -L ~/.brew/lib/ -lSDL2 -lSDL2main -I. -I ~/.brew/include/ instantcg.cpp -o rayflat
 
 wolf3d:	
-	gcc wolf3d.c -L ~/.brew/lib/ -lSDL2 -lSDL2main -I. -I ~/.brew/include/ -o wolf3d
+	gcc wolf3d.c ray.c player.c screen.c -L ~/.brew/lib/ -lSDL2 -lSDL2main -I. -I ~/.brew/include/ -o wolf3d
 
 re: clean wolf3d
 	./wolf3d

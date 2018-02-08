@@ -44,18 +44,35 @@ bool init_window(bool fullscreen, const char *title, SDL_Window *window, SDL_Ren
 	return (success);
 }
 
-bool read()
+bool read_map()
 {
 	return (true);
 }
 
-void update()
+void update(SDL_Renderer* renderer)
 {
-	while(!done(true, true));
-	//init variables
-	//initial calculations
-	//DDA
+	t_ray ray;
+	t_player player;
+	int x;
+	int wall_height;
 
+	init_player(&player);
+	//time = 0;
+	x = 0;
+	while(!done(true, true))
+	{
+		while(x < SCREEN_WIDTH)
+		{
+			ray.camera_x = 2 * x / (double)SCREEN_WIDTH - 1;
+			wall_height = (int)(SCREEN_HEIGHT / dist_to_wall(ray, player));
+			draw_line(wall_height);
+	        x++;
+    	}
+		x = 0;
+		//count_FPS
+		// draw_screen(renderer);
+		get_player_pos(player);
+	}
 }
 
 void end(SDL_Window *window, SDL_Renderer *renderer)
@@ -72,8 +89,8 @@ int main(int argc, char *args[])
 	SDL_Window *window;
 	SDL_Renderer* renderer;
 
-	if (read() && init_window(false, "Wolf3D", window, renderer))
-		update();
+	if (read_map() && init_window(false, "Wolf3D", window, renderer))
+		update(renderer);
 	end(window, renderer);
 	return 0;
 }
@@ -84,24 +101,4 @@ bool put_error(char *str)
 	perror(SDL_GetError());
 	perror("\n");
 	return (false);
-}
-
-bool keyDown(SDL_Scancode key)
-{
-    return (SDL_GetKeyboardState(NULL)[key] != 0);
-}
-
-//Returns 1 if you close the window or press the escape key.
-//Also handles everything thats needed per frame.
-bool done(bool quit_if_esc, bool delay)
-{
-	SDL_Event event;
-	if (delay) SDL_Delay(5); //So it consumes less processing power
-   
-	while (SDL_PollEvent(&event))
-	{
-		if (event.type == SDL_QUIT) return true;
-		if (quit_if_esc && keyDown(SDL_SCANCODE_ESCAPE))return true;
-	}
-	return false;
 }
