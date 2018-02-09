@@ -13,64 +13,95 @@
 #include "wolf3d.h"
 #include <stdio.h>
 
-bool init_window(bool fullscreen, const char *title, SDL_Window *window, SDL_Renderer* renderer)
+int world_map[MAP_WIDTH][MAP_HEIGHT] = {
+	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0, 0, 0, 3, 0, 3, 0, 3, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 0, 0, 0, 0, 5, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 0, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+	{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+
+bool init_window(bool fullscreen, const char *title, SDL_Window **window,
+				 SDL_Renderer **renderer)
 {
 	SDL_Surface *screenSurface = NULL;
-	bool success;
+	bool		 success;
 
 	success = true;
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-		success = put_error("SDL could not be initialized! SDL_Error: ");
-	else
-	{
-		window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
-								  SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH,
-								  SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-		if (window == NULL)
-			success = put_error("Window could not be created! SDL_Error: ");
-		renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-		if (renderer == NULL)
-			success = put_error("Renderer could not be created! SDL_Error: ");
-		SDL_RenderPresent(renderer);
-		// else
-		// {
-		// 	screenSurface = SDL_GetWindowSurface(window);
-		// 	SDL_FillRect(screenSurface, NULL,
-		// 				 SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-		// 	SDL_UpdateWindowSurface(window);
-		// 	SDL_Delay(2000);
-		// }
-	}
+	// if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	// 	success = put_error("SDL could not be initialized! SDL_Error: ");
+	// else
+	// {
+	*window =
+		SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+						 SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (*window == NULL)
+		success = put_error("Window could not be created! SDL_Error: ");
+	*renderer = SDL_CreateRenderer(
+		*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (*renderer == NULL)
+		success = put_error("Renderer could not be created! SDL_Error: ");
+	// SDL_RenderPresent(renderer);
+	// else
+	// {
+	// 	screenSurface = SDL_GetWindowSurface(window);
+	// 	SDL_FillRect(screenSurface, NULL,
+	// 				 SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+	// 	SDL_UpdateWindowSurface(window);
+	// 	SDL_Delay(2000);
+	// }
+	// }
 	return (success);
 }
 
-bool read_map()
-{
-	return (true);
-}
+bool read_map() { return (true); }
 
-void update(SDL_Renderer* renderer)
+void update(SDL_Renderer *renderer)
 {
-	t_ray ray;
+	t_ray	ray;
 	t_player player;
-	int x;
-	int wall_height;
+	int		 x;
+	int		 wall_height;
+	t_line   line;
 
 	init_player(&player);
-	//time = 0;
+	// time = 0;
 	x = 0;
-	while(!done(true, true))
+	// SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+	// SDL_RenderDrawLine(renderer, 200, 100, 200, 300);
+	// SDL_RenderPresent(renderer);
+	while (!done(true, true))
 	{
-		while(x < SCREEN_WIDTH)
+		while (x < SCREEN_WIDTH)
 		{
 			ray.camera_x = 2 * x / (double)SCREEN_WIDTH - 1;
-			wall_height = (int)(SCREEN_HEIGHT / dist_to_wall(ray, player));
-			draw_line(wall_height);
-	        x++;
-    	}
+			ray.length = dist_to_wall(&ray, player, world_map);
+			line.height = (int)(SCREEN_HEIGHT / ray.length);
+			set_line(&line, ray.is_x_side, world_map[ray.map_x][ray.map_y]);
+			draw_line(x, line.start, line.end, line.color, renderer);
+			x++;
+		}
+		draw_screen(line.color, renderer);
 		x = 0;
-		//count_FPS
-		// draw_screen(renderer);
+		// count_FPS
 		get_player_pos(player);
 	}
 }
@@ -86,10 +117,10 @@ void end(SDL_Window *window, SDL_Renderer *renderer)
 
 int main(int argc, char *args[])
 {
-	SDL_Window *window;
-	SDL_Renderer* renderer;
+	SDL_Window *  window;
+	SDL_Renderer *renderer;
 
-	if (read_map() && init_window(false, "Wolf3D", window, renderer))
+	if (read_map() && init_window(false, "Wolf3D", &window, &renderer))
 		update(renderer);
 	end(window, renderer);
 	return 0;
