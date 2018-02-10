@@ -102,7 +102,7 @@ void update(SDL_Renderer *renderer)
 		draw_screen(line.color, renderer);
 		x = 0;
 		// count_FPS
-		get_player_pos(player);
+		set_player_pos(&player, world_map);
 	}
 }
 

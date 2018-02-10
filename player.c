@@ -22,27 +22,80 @@ void init_player(t_player *player)
 	player->plane_y = 0.66;
 }
 
-bool keyDown(SDL_Scancode key)
+double get_frametime()
 {
-	return (SDL_GetKeyboardState(NULL)[key] != 0);
+	static unsigned long prev_ticks;
+	static unsigned long ticks;
+
+	prev_ticks = ticks;
+	ticks = SDL_GetTicks();
+	return ((ticks - prev_ticks) / 1000.0);
 }
 
-void get_player_pos(t_player player) {}
-
-// Returns 1 if you close the window or press the escape key.
-// Also handles everything thats needed per frame.
-bool done(bool quit_if_esc, bool delay)
+void move_forward(t_player *player, int world_map[24][24])
 {
-	SDL_Event event;
-	if (delay)
-		SDL_Delay(5); // So it consumes less processing power
+	if (!world_map[(int)(player->pos_x + player->dir_x * player->move_speed)]
+				  [(int)player->pos_y])
+		player->pos_x += player->dir_x * player->move_speed;
+	if (!world_map[(int)player->pos_x]
+				  [(int)(player->pos_y + player->dir_y * player->move_speed)])
+		player->pos_y += player->dir_y * player->move_speed;
+}
 
-	while (SDL_PollEvent(&event))
-	{
-		if (event.type == SDL_QUIT)
-			return true;
-		if (quit_if_esc && keyDown(SDL_SCANCODE_ESCAPE))
-			return true;
-	}
-	return false;
+void move_backward(t_player *player, int world_map[24][24])
+{
+	if (!world_map[(int)(player->pos_x - player->dir_x * player->move_speed)]
+				  [(int)player->pos_y])
+		player->pos_x -= player->dir_x * player->move_speed;
+	if (!world_map[(int)player->pos_x]
+				  [(int)(player->pos_y - player->dir_y * player->move_speed)])
+		player->pos_y -= player->dir_y * player->move_speed;
+}
+
+void look_right(t_player *player, int world_map[24][24])
+{
+	// both camera direction and camera plane must be rotated
+	double oldDirX = player->dir_x;
+	player->dir_x = player->dir_x * cos(-player->rot_speed) -
+					player->dir_y * sin(-player->rot_speed);
+	player->dir_y = oldDirX * sin(-player->rot_speed) +
+					player->dir_y * cos(-player->rot_speed);
+	double oldPlaneX = player->plane_x;
+	player->plane_x = player->plane_x * cos(-player->rot_speed) -
+					  player->plane_y * sin(-player->rot_speed);
+	player->plane_y = oldPlaneX * sin(-player->rot_speed) +
+					  player->plane_y * cos(-player->rot_speed);
+}
+
+void look_left(t_player *player, int world_map[24][24])
+{
+	// both camera direction and camera plane must be rotated
+	double oldDirX = player->dir_x;
+	player->dir_x = player->dir_x * cos(player->rot_speed) -
+					player->dir_y * sin(player->rot_speed);
+	player->dir_y = oldDirX * sin(player->rot_speed) +
+					player->dir_y * cos(player->rot_speed);
+	double oldPlaneX = player->plane_x;
+	player->plane_x = player->plane_x * cos(player->rot_speed) -
+					  player->plane_y * sin(player->rot_speed);
+	player->plane_y = oldPlaneX * sin(player->rot_speed) +
+					  player->plane_y * cos(player->rot_speed);
+}
+
+void set_player_pos(t_player *player, int world_map[24][24])
+{
+	double frame_time;
+
+	frame_time = get_frametime();
+	player->move_speed = frame_time * 5.0;
+	player->rot_speed = frame_time * 3.0;
+
+	if (is_input_key(SDLK_UP))
+		move_forward(player, world_map);
+	if (is_input_key(SDLK_DOWN))
+		move_backward(player, world_map);
+	if (is_input_key(SDLK_RIGHT))
+		look_right(player, world_map);
+	if (is_input_key(SDLK_LEFT))
+		look_left(player, world_map);
 }

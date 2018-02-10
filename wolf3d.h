@@ -16,6 +16,8 @@ typedef struct s_player
 	double dir_y;
 	double plane_x;
 	double plane_y;
+	double move_speed;
+	double rot_speed;
 } t_player;
 
 typedef struct s_ray
@@ -55,8 +57,9 @@ double dist_to_wall(t_ray *ray, t_player player, int world_map[MAP_WIDTH][MAP_HE
 void set_line(t_line *line, bool is_x_side, int wall);
 void draw_line(int x, int y1, int y2, const t_color color, SDL_Renderer *renderer);
 void draw_screen(t_color color, SDL_Renderer *renderer);
-void   get_player_pos(t_player player);
+void set_player_pos(t_player *player, int world_map[24][24]);
 bool   put_error(char *str);
+bool is_input_key(SDL_Keycode key);
 bool   done(bool quit_if_esc, bool delay);
 
 #endif
