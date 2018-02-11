@@ -7,6 +7,13 @@
 #define SCREEN_HEIGHT 1024
 #define MAP_WIDTH 24
 #define MAP_HEIGHT 24
+# define BUFF_SIZE  4096
+
+// # include <sys/types.h>
+// # include <sys/stat.h>
+# include <fcntl.h>
+// # include <stdlib.h>
+# include <unistd.h>
 
 typedef struct s_player
 {
@@ -61,5 +68,6 @@ void set_player_pos(t_player *player, int world_map[24][24]);
 bool   put_error(char *str);
 bool is_input_key(SDL_Keycode key);
 bool   done(bool quit_if_esc, bool delay);
+char	*ft_file_to_str(const char *file_name);
 
 #endif

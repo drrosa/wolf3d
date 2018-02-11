@@ -12,17 +12,16 @@
 
 #include "wolf3d.h"
 
-// void pset(int x, int y, const ColorRGB& color)
-// {
-//   SDL_SetRenderDrawColor(ren, color.r, color.g, color.b, 255);
-//   SDL_RenderDrawPoint(ren, x, y);
-// }
-
-void draw_line(int x, int y1, int y2, const t_color color,
+void draw_line(int x, int start, int end, const t_color color,
 			   SDL_Renderer *renderer)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-	SDL_RenderDrawLine(renderer, x, y1, x, y2);
+	while(start < end)
+	{
+  		SDL_RenderDrawPoint(renderer, x, start++);
+	}
+	// SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+	// SDL_RenderDrawLine(renderer, x, start, x, end);
 }
 
 void set_wall_colors(t_color color[5])

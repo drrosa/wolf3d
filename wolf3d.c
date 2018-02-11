@@ -72,7 +72,30 @@ bool init_window(bool fullscreen, const char *title, SDL_Window **window,
 	return (success);
 }
 
-bool read_map() { return (true); }
+bool read_map(char *file_name)
+{
+	int fd;
+	char *str;
+    char **map;
+    unsigned int i;
+
+	// if ((fd = open(file_name, O_RDONLY, S_IRUSR)))
+	str = ft_file_to_str(file_name);
+    i = 0;
+    map = (char **)malloc(sizeof(char *) * MAP_HEIGHT);
+    map[0] = (char *)malloc(sizeof(char) * MAP_WIDTH * MAP_HEIGHT);
+
+    while(i < MAP_HEIGHT)
+    {
+        map[i] = (str + MAP_WIDTH * i);
+		printf("%s\n", map[i]);
+        i++;
+    }
+	// else
+	// 	return (false);
+	// printf("%s\n", str);
+	return (true);
+}
 
 void update(SDL_Renderer *renderer)
 {
@@ -83,11 +106,7 @@ void update(SDL_Renderer *renderer)
 	t_line   line;
 
 	init_player(&player);
-	// time = 0;
 	x = 0;
-	// SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-	// SDL_RenderDrawLine(renderer, 200, 100, 200, 300);
-	// SDL_RenderPresent(renderer);
 	while (!done(true, true))
 	{
 		while (x < SCREEN_WIDTH)
@@ -96,6 +115,7 @@ void update(SDL_Renderer *renderer)
 			ray.length = dist_to_wall(&ray, player, world_map);
 			line.height = (int)(SCREEN_HEIGHT / ray.length);
 			set_line(&line, ray.is_x_side, world_map[ray.map_x][ray.map_y]);
+			//TODO: draw line with pset function
 			draw_line(x, line.start, line.end, line.color, renderer);
 			x++;
 		}
@@ -115,12 +135,12 @@ void end(SDL_Window *window, SDL_Renderer *renderer)
 	exit(1);
 }
 
-int main(int argc, char *args[])
+int main(int argc, char **argv)
 {
 	SDL_Window *  window;
 	SDL_Renderer *renderer;
 
-	if (read_map() && init_window(false, "Wolf3D", &window, &renderer))
+	if (read_map(argv[1]) && init_window(false, "Wolf3D", &window, &renderer))
 		update(renderer);
 	end(window, renderer);
 	return 0;
