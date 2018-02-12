@@ -12,14 +12,20 @@
 
 #include "wolf3d.h"
 
-static void set_ray(t_ray *ray, t_player player)
+void		init_player(t_player *player)
+{
+	player->pos_x = 22;
+	player->pos_y = 12;
+	player->dir_x = -1;
+	player->dir_y = 0;
+	player->plane_x = 0;
+	player->plane_y = 0.66;
+}
+
+static void	set_ray(t_ray *ray, t_player player)
 {
 	ray->dir_x = player.dir_x + player.plane_x * ray->camera_x;
 	ray->dir_y = player.dir_y + player.plane_y * ray->camera_x;
-	//
-	ray->map_x = (int)player.pos_x;
-	ray->map_y = (int)player.pos_y;
-	//
 	ray->delta_dist_x = fabs(1 / ray->dir_x);
 	ray->delta_dist_y = fabs(1 / ray->dir_y);
 	if (ray->dir_x < 0)
@@ -43,8 +49,8 @@ static void set_ray(t_ray *ray, t_player player)
 		ray->side_dist_y = (ray->map_y + 1 - player.pos_y) * ray->delta_dist_y;
 	}
 }
-// dda
-static void cast_ray(t_ray *ray, int world_map[MAP_WIDTH][MAP_HEIGHT])
+
+static void	cast_ray(t_ray *ray, int **world_map)
 {
 	bool is_wall;
 
@@ -68,11 +74,12 @@ static void cast_ray(t_ray *ray, int world_map[MAP_WIDTH][MAP_HEIGHT])
 	}
 }
 
-double dist_to_wall(t_ray *ray, t_player player,
-					int world_map[MAP_WIDTH][MAP_HEIGHT])
+double		dist_to_wall(t_ray *ray, t_player player, int **world_map)
 {
 	double ray_len;
 
+	ray->map_x = (int)player.pos_x;
+	ray->map_y = (int)player.pos_y;
 	set_ray(ray, player);
 	cast_ray(ray, world_map);
 	if (ray->is_x_side)

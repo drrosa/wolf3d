@@ -12,33 +12,38 @@
 
 #include "wolf3d.h"
 
-void draw_line(int x, int start, int end, const t_color color,
-			   SDL_Renderer *renderer)
+double	get_frametime(void)
 {
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-	while(start < end)
-	{
-  		SDL_RenderDrawPoint(renderer, x, start++);
-	}
-	// SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-	// SDL_RenderDrawLine(renderer, x, start, x, end);
+	static unsigned long prev_ticks;
+	static unsigned long ticks;
+
+	prev_ticks = ticks;
+	ticks = SDL_GetTicks();
+	return ((ticks - prev_ticks) / 1000.0);
 }
 
-void set_wall_colors(t_color color[5])
+void	draw_line(int x, t_line line, SDL_Renderer *renderer)
 {
-	/*Red*/
+	t_color color;
+
+	color = line.color;
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
+	while (line.start < line.end)
+	{
+		SDL_RenderDrawPoint(renderer, x, line.start++);
+	}
+}
+
+void	set_wall_colors(t_color color[5])
+{
 	color[1] = (struct s_color){255, 0, 0};
-	/*Green*/
 	color[2] = (struct s_color){0, 255, 0};
-	/*Blue*/
 	color[3] = (struct s_color){0, 0, 255};
-	/*White*/
 	color[4] = (struct s_color){255, 255, 255};
-	/*Yellow*/
 	color[0] = (struct s_color){255, 255, 0};
 }
 
-void set_line(t_line *line, bool is_x_side, int wall)
+void	set_line(t_line *line, bool is_x_side, int wall)
 {
 	t_color color[5];
 	t_color wall_color;
@@ -50,9 +55,7 @@ void set_line(t_line *line, bool is_x_side, int wall)
 	line->end = (line->height / 2) + (SCREEN_HEIGHT / 2);
 	if (line->end >= SCREEN_HEIGHT)
 		line->end = SCREEN_HEIGHT - 1;
-
 	line->color = color[wall];
-
 	if (!is_x_side)
 	{
 		line->color.r /= 2;
@@ -61,10 +64,9 @@ void set_line(t_line *line, bool is_x_side, int wall)
 	}
 }
 
-void draw_screen(t_color color, SDL_Renderer *renderer)
+void	draw_screen(t_color color, SDL_Renderer *renderer)
 {
 	SDL_RenderPresent(renderer);
-	// Black
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 }
