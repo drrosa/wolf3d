@@ -71,7 +71,7 @@ typedef struct	s_line
 void			init_player(t_player *player);
 double			dist_to_wall(t_ray *ray, t_player player, int **world_map);
 void			set_line(t_line *line, bool is_x_side, int wall);
-void			draw_line(int x, t_line line, SDL_Renderer *renderer);
+void			draw_pixels(int x, t_line line, SDL_Renderer *renderer);
 void			draw_screen(SDL_Renderer *renderer);
 void			set_player_pos(t_player *player, int **world_map);
 bool			put_error(char *str);

@@ -81,7 +81,7 @@ void	update(SDL_Renderer *renderer, int **world_map)
 			ray.length = dist_to_wall(&ray, player, world_map);
 			line.height = (int)(SCREEN_HEIGHT / ray.length);
 			set_line(&line, ray.is_x_side, world_map[ray.map_x][ray.map_y]);
-			draw_line(x, line, renderer);
+			draw_pixels(x, line, renderer);
 			x++;
 		}
 		draw_screen(renderer);

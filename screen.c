@@ -22,16 +22,13 @@ double	get_frametime(void)
 	return ((ticks - prev_ticks) / 1000.0);
 }
 
-void	draw_line(int x, t_line line, SDL_Renderer *renderer)
+void	draw_pixels(int x, t_line line, SDL_Renderer *renderer)
 {
 	t_color color;
 
 	color = line.color;
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-	while (line.start < line.end)
-	{
-		SDL_RenderDrawPoint(renderer, x, line.start++);
-	}
+	SDL_RenderDrawLine(renderer, x, line.start, x, line.end);
 }
 
 void	set_wall_colors(t_color color[5])
