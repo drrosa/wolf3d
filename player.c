@@ -32,7 +32,7 @@ void	move_backward(t_player *player, int **world_map)
 		player->pos_y -= player->dir_y * player->move_speed;
 }
 
-void	look_right(t_player *player, int **world_map)
+void	look_right(t_player *player)
 {
 	double old_dir_x;
 	double old_plane_x;
@@ -49,7 +49,7 @@ void	look_right(t_player *player, int **world_map)
 						player->plane_y * cos(-player->rot_speed);
 }
 
-void	look_left(t_player *player, int **world_map)
+void	look_left(t_player *player)
 {
 	double old_dir_x;
 	double old_plane_x;
@@ -78,7 +78,7 @@ void	set_player_pos(t_player *player, int **world_map)
 	if (is_input_key(SDLK_DOWN))
 		move_backward(player, world_map);
 	if (is_input_key(SDLK_RIGHT))
-		look_right(player, world_map);
+		look_right(player);
 	if (is_input_key(SDLK_LEFT))
-		look_left(player, world_map);
+		look_left(player);
 }

@@ -12,7 +12,7 @@
 
 #include "wolf3d.h"
 
-bool	init_window(bool fullscreen, const char *title, SDL_Window **window,
+bool	init_window(const char *title, SDL_Window **window,
 					SDL_Renderer **renderer)
 {
 	bool	success;
@@ -68,7 +68,6 @@ void	update(SDL_Renderer *renderer, int **world_map)
 	t_ray		ray;
 	t_player	player;
 	int			x;
-	int			wall_height;
 	t_line		line;
 
 	SDL_RenderClear(renderer);
@@ -85,7 +84,7 @@ void	update(SDL_Renderer *renderer, int **world_map)
 			draw_line(x, line, renderer);
 			x++;
 		}
-		draw_screen(line.color, renderer);
+		draw_screen(renderer);
 		x = 0;
 		set_player_pos(&player, world_map);
 	}
@@ -110,8 +109,11 @@ int		main(int argc, char **argv)
 	SDL_Renderer	*renderer;
 	int				**world_map;
 
+	window = NULL;
+	renderer = NULL;
+	world_map = NULL;
 	if (argc > 1 && (world_map = read_map(ft_file_to_str(argv[1]))))
-		if (init_window(false, "Wolf3D", &window, &renderer))
+		if (init_window("Wolf3D", &window, &renderer))
 			update(renderer, world_map);
 	end(window, renderer, world_map);
 	return (0);

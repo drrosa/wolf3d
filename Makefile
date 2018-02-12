@@ -1,20 +1,21 @@
-all:
+NAME = wolf3d
+SRCS = wolf3d.c ray.c player.c screen.c input.c
+LIBS = -L ~/.brew/lib/ -lSDL2 -lSDL2main
+INCLUDES = -I . -I ~/.brew/include/
+WARNINGS = -Wall -Werror -Wextra
 
-tutorial:
-	gcc tutorial.c -I SDL2/ -L SDL2/ -lSDL2 -o tutorial
+all: $(NAME)
 
-example:
-	g++ example.c instantcg.cpp -L ~/.brew/lib/ -lSDL2 -lSDL2main -I. -I ~/.brew/include/ -o example
+$(NAME):
+	@gcc -o $(NAME) $(WARNINGS) $(LIBS) $(INCLUDES) $(SRCS)
 
-rayflat:
-	g++ -g raycaster_flat.cpp -L ~/.brew/lib/ -lSDL2 -lSDL2main -I. -I ~/.brew/include/ instantcg.cpp -o rayflat
-
-wolf3d:
-	gcc -g wolf3d.c ray.c player.c screen.c input.c -L ~/.brew/lib/ -lSDL2 -lSDL2main -I. -I ~/.brew/include/ -o wolf3d
-
-re: clean wolf3d
-	./wolf3d
+debug:
+	@gcc -g -o $(NAME) $(LIBS) $(INCLUDES) $(SRCS)
 
 clean:
-	rm wolf3d
-#set -x DYLD_LIBRARY_PATH $PWD/libs/ $DYLD_LIBRARY_PATH
+	@/bin/rm -f
+
+fclean:
+	@/bin/rm -f $(NAME)
+
+re: fclean all

@@ -46,7 +46,6 @@ void	set_wall_colors(t_color color[5])
 void	set_line(t_line *line, bool is_x_side, int wall)
 {
 	t_color color[5];
-	t_color wall_color;
 
 	set_wall_colors(color);
 	line->start = (-line->height / 2) + (SCREEN_HEIGHT / 2);
@@ -64,7 +63,7 @@ void	set_line(t_line *line, bool is_x_side, int wall)
 	}
 }
 
-void	draw_screen(t_color color, SDL_Renderer *renderer)
+void	draw_screen(SDL_Renderer *renderer)
 {
 	SDL_RenderPresent(renderer);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
