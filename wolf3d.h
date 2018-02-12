@@ -68,7 +68,7 @@ typedef struct	s_line
 	t_color color;
 }				t_line;
 
-void			iinit_player(t_player *player);
+void			init_player(t_player *player);
 double			dist_to_wall(t_ray *ray, t_player player, int **world_map);
 void			set_line(t_line *line, bool is_x_side, int wall);
 void			draw_line(int x, t_line line, SDL_Renderer *renderer);
