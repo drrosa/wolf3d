@@ -22,29 +22,32 @@ double	get_frametime(void)
 	return ((ticks - prev_ticks) / 1000.0);
 }
 
-void	draw_pixels(int x, t_line line, SDL_Renderer *renderer)
+void	draw_pixels(int x, t_line line, Uint32 **buffer)
 {
-	t_color color;
-
-	color = line.color;
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
-	SDL_RenderDrawLine(renderer, x, line.start, x, line.end);
+	while (line.start < line.end)
+		buffer[line.start++][x] = line.color;
 }
 
-void	set_wall_colors(t_color color[5])
+void	set_wall_colors(Uint32 color[5], bool is_x_side)
 {
-	color[1] = (struct s_color){255, 0, 0};
-	color[2] = (struct s_color){0, 255, 0};
-	color[3] = (struct s_color){0, 0, 255};
-	color[4] = (struct s_color){255, 255, 255};
-	color[0] = (struct s_color){255, 255, 0};
+	int color_brightness;
+
+	if (!is_x_side)
+		color_brightness = 127;
+	else
+		color_brightness = 255;
+	color[1] = color_brightness << 16;
+	color[2] = color_brightness << 8;
+	color[3] = color_brightness;
+	color[4] = color[1] | color[2] | color[3];
+	color[0] = color[1] | color[2];
 }
 
 void	set_line(t_line *line, bool is_x_side, int wall)
 {
-	t_color color[5];
+	Uint32 color[5];
 
-	set_wall_colors(color);
+	set_wall_colors(color, is_x_side);
 	line->start = (-line->height / 2) + (SCREEN_HEIGHT / 2);
 	if (line->start < 0)
 		line->start = 0;
@@ -52,17 +55,26 @@ void	set_line(t_line *line, bool is_x_side, int wall)
 	if (line->end >= SCREEN_HEIGHT)
 		line->end = SCREEN_HEIGHT - 1;
 	line->color = color[wall];
-	if (!is_x_side)
-	{
-		line->color.r /= 2;
-		line->color.b /= 2;
-		line->color.g /= 2;
-	}
 }
 
-void	draw_screen(SDL_Renderer *renderer)
+void	draw_screen(SDL_Renderer *renderer, Uint32 **buffer, SDL_Texture *tex)
 {
+	int y;
+	int x;
+
+	x = 0;
+	y = 0;
+	SDL_UpdateTexture(tex, NULL, *buffer, (SCREEN_WIDTH) * sizeof(Uint32));
+	SDL_RenderCopy(renderer, tex, NULL, NULL);
+	while (x < SCREEN_WIDTH)
+	{
+		while (y < SCREEN_HEIGHT)
+		{
+			buffer[y][x] = 0;
+			y++;
+		}
+		y = 0;
+		x++;
+	}
 	SDL_RenderPresent(renderer);
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
 }

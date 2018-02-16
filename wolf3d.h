@@ -53,26 +53,19 @@ typedef struct	s_ray
 	double	length;
 }				t_ray;
 
-typedef struct	s_color
-{
-	int r;
-	int g;
-	int b;
-}				t_color;
-
 typedef struct	s_line
 {
 	int		height;
 	int		start;
 	int		end;
-	t_color color;
+	Uint32	color;
 }				t_line;
 
 void			init_player(t_player *player);
 double			dist_to_wall(t_ray *ray, t_player player, int **world_map);
 void			set_line(t_line *line, bool is_x_side, int wall);
-void			draw_pixels(int x, t_line line, SDL_Renderer *renderer);
-void			draw_screen(SDL_Renderer *renderer);
+void			draw_pixels(int x, t_line line, Uint32 **buffer);
+void			draw_screen(SDL_Renderer *ren, Uint32 **buff, SDL_Texture *tex);
 void			set_player_pos(t_player *player, int **world_map);
 bool			put_error(char *str);
 bool			is_input_key(SDL_Keycode key);

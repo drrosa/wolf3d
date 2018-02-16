@@ -13,9 +13,10 @@
 #include "wolf3d.h"
 
 bool	init_window(const char *title, SDL_Window **window,
-					SDL_Renderer **renderer)
+					SDL_Renderer **renderer, SDL_Texture **texture)
 {
 	bool	success;
+	Uint32	pixel_format;
 
 	success = true;
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -27,15 +28,18 @@ bool	init_window(const char *title, SDL_Window **window,
 									SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 		if (*window == NULL)
 			success = put_error("Window could not be created! SDL_Error: ");
+		pixel_format = SDL_GetWindowPixelFormat(*window);
 		*renderer = SDL_CreateRenderer(
 			*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 		if (*renderer == NULL)
 			success = put_error("Renderer could not be created! SDL_Error: ");
+		*texture = SDL_CreateTexture(*renderer, pixel_format, 0,
+									SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 	return (success);
 }
 
-int		**read_map(char *str)
+int		**read_map(char *str, int w, int h)
 {
 	int	**map;
 	int i;
@@ -44,14 +48,14 @@ int		**read_map(char *str)
 
 	if (!str)
 		return (0);
-	map = (int **)malloc(sizeof(*map) * MAP_HEIGHT);
-	*map = (int *)malloc(sizeof(**map) * (MAP_WIDTH * MAP_HEIGHT));
-	i = MAP_HEIGHT;
+	map = (int **)malloc(sizeof(*map) * h);
+	*map = (int *)malloc(sizeof(**map) * (w * h));
+	i = h;
 	j = 0;
 	k = -1;
 	while (--i)
-		map[i] = (*map + MAP_WIDTH * i);
-	while (str[++k])
+		map[i] = (*map + w * i);
+	while (str[0] != '\0' && str[++k])
 		if (str[k] != '\n')
 			map[i][j++] = (int)(str[k] - '0');
 		else
@@ -59,33 +63,34 @@ int		**read_map(char *str)
 			j = 0;
 			i++;
 		}
-	free(str);
 	return (map);
 }
 
-void	update(SDL_Renderer *renderer, int **world_map)
+void	update(SDL_Renderer *renderer, int **world_map, SDL_Texture *texture)
 {
 	t_ray		ray;
 	t_player	player;
 	int			x;
 	t_line		line;
+	Uint32		**buffer;
 
+	buffer = (Uint32 **)read_map("", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_RenderClear(renderer);
 	init_player(&player);
 	x = 0;
 	while (!done(true, true))
 	{
+		x = 0;
 		while (x < SCREEN_WIDTH)
 		{
 			ray.camera_x = 2 * x / (double)SCREEN_WIDTH - 1;
 			ray.length = dist_to_wall(&ray, player, world_map);
 			line.height = (int)(SCREEN_HEIGHT / ray.length);
 			set_line(&line, ray.is_x_side, world_map[ray.map_x][ray.map_y]);
-			draw_pixels(x, line, renderer);
+			draw_pixels(x, line, buffer);
 			x++;
 		}
-		draw_screen(renderer);
-		x = 0;
+		draw_screen(renderer, buffer, texture);
 		set_player_pos(&player, world_map);
 	}
 }
@@ -107,14 +112,18 @@ int		main(int argc, char **argv)
 {
 	SDL_Window		*window;
 	SDL_Renderer	*renderer;
+	SDL_Texture		*texture;
 	int				**world_map;
+	char			*str;
 
 	window = NULL;
 	renderer = NULL;
-	world_map = NULL;
-	if (argc > 1 && (world_map = read_map(ft_file_to_str(argv[1]))))
-		if (init_window("Wolf3D", &window, &renderer))
-			update(renderer, world_map);
+	str = ft_file_to_str(argv[1]);
+	world_map = read_map(str, MAP_WIDTH, MAP_HEIGHT);
+	free(str);
+	if (argc > 1 && world_map)
+		if (init_window("Wolf3D", &window, &renderer, &texture))
+			update(renderer, world_map, texture);
 	end(window, renderer, world_map);
 	return (0);
 }
