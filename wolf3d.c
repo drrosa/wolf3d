@@ -47,7 +47,7 @@ int		**read_map(char *str, int w, int h)
 	int k;
 
 	if (!str)
-		return (0);
+		return (NULL);
 	map = (int **)malloc(sizeof(*map) * h);
 	*map = (int *)malloc(sizeof(**map) * (w * h));
 	i = h;
@@ -63,6 +63,8 @@ int		**read_map(char *str, int w, int h)
 			j = 0;
 			i++;
 		}
+	if (str[0] != '\0' && k != (w * h) + h)
+		map = NULL;
 	return (map);
 }
 
@@ -102,6 +104,8 @@ void	end(SDL_Window *window, SDL_Renderer *renderer, int **map)
 		free(*map);
 		free(map);
 	}
+	else
+		write(1, "Map Error!\n", 12);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -118,12 +122,20 @@ int		main(int argc, char **argv)
 
 	window = NULL;
 	renderer = NULL;
-	str = ft_file_to_str(argv[1]);
-	world_map = read_map(str, MAP_WIDTH, MAP_HEIGHT);
-	free(str);
-	if (argc > 1 && world_map)
+	world_map = NULL;
+	if (argc >= 2)
+	{
+		str = ft_file_to_str(argv[1]);
+		if (str && str[0] == '1')
+			world_map = read_map(str, MAP_WIDTH, MAP_HEIGHT);
+		free(str);
+	}
+	if (world_map)
+	{
+		set_boundary(&world_map[0], MAP_WIDTH, MAP_HEIGHT);
 		if (init_window("Wolf3D", &window, &renderer, &texture))
 			update(renderer, world_map, texture);
+	}
 	end(window, renderer, world_map);
 	return (0);
 }

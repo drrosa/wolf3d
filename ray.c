@@ -12,10 +12,31 @@
 
 #include "wolf3d.h"
 
+void		set_boundary(int **map, int w, int h)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
+	while (i < h)
+	{
+		while (j < w)
+		{
+			if ((i == 0 && j < w) || (i < h && j == 0) ||
+				(j == w - 1 && i < h) || (i == h - 1 && j < w))
+				map[i][j] = 1;
+			j++;
+		}
+		j = 0;
+		i++;
+	}
+}
+
 void		init_player(t_player *player)
 {
-	player->pos_x = 22;
-	player->pos_y = 12;
+	player->pos_x = PLAYER_START_X;
+	player->pos_y = PLAYER_START_Y;
 	player->dir_x = -1;
 	player->dir_y = 0;
 	player->plane_x = 0;

@@ -23,6 +23,8 @@
 # define MAP_WIDTH 24
 # define MAP_HEIGHT 24
 # define BUFF_SIZE 4096
+# define PLAYER_START_X 22
+# define PLAYER_START_Y 12
 
 typedef struct	s_player
 {
@@ -72,5 +74,6 @@ bool			is_input_key(SDL_Keycode key);
 bool			done(bool quit_if_esc, bool delay);
 char			*ft_file_to_str(const char *file_name);
 double			get_frametime(void);
+void			set_boundary(int **map, int w, int h);
 
 #endif
