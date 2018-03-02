@@ -70,9 +70,9 @@ void	draw_screen(SDL_Renderer *renderer, Uint32 **buffer, SDL_Texture *tex)
 	{
 		while (y < SCREEN_HEIGHT)
 		{
-			if (y > SCREEN_HEIGHT/2)
+			if (y > SCREEN_HEIGHT / 2)
 				buffer[y][x] = 0x00654321;
-			else if (y < SCREEN_HEIGHT/2)
+			else if (y < SCREEN_HEIGHT / 2)
 				buffer[y][x] = 0x00add8e6;
 			else
 				buffer[y][x] = 0;
