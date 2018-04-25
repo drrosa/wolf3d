@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drosa-ta <drosa-ta@student.42.us.or>       +#+  +:+       +#+        */
+/*   By: drosa-ta <drosa-ta@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/09 15:11:48 by drosa-ta          #+#    #+#             */
-/*   Updated: 2018/02/09 15:11:50 by drosa-ta         ###   ########.fr       */
+/*   Updated: 2018/04/25 00:22:38 by drosa-ta         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ bool	is_input_key(SDL_Keycode key)
 	return (input[SDL_GetScancodeFromKey(key)] != 0);
 }
 
-bool	done(bool quit_if_esc, bool delay)
+bool	done(bool quit_if_esc, bool delay, Mix_Music *music)
 {
 	SDL_Event event;
 
@@ -70,8 +70,19 @@ bool	done(bool quit_if_esc, bool delay)
 	{
 		if (event.type == SDL_QUIT)
 			return (true);
-		if (quit_if_esc && is_input_key(SDLK_ESCAPE))
+		else if (quit_if_esc && is_input_key(SDLK_ESCAPE))
 			return (true);
+		else if (is_input_key(SDLK_9))
+		{
+			if (Mix_PlayingMusic() == 0)
+				Mix_PlayMusic(music, -1);
+			return (false);
+		}
+		else if (is_input_key(SDLK_0))
+		{
+			Mix_HaltMusic();
+			return (false);
+		}
 	}
 	return (false);
 }

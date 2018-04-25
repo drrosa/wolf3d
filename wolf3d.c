@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wolf3d.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drosa-ta <drosa-ta@student.42.us.or>       +#+  +:+       +#+        */
+/*   By: drosa-ta <drosa-ta@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/04 18:00:00 by drosa-ta          #+#    #+#             */
-/*   Updated: 2018/02/05 00:09:54 by drosa-ta         ###   ########.fr       */
+/*   Updated: 2018/04/25 00:32:38 by drosa-ta         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@ bool	init_window(const char *title, SDL_Window **window,
 	Uint32	pixel_format;
 
 	success = true;
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-		success = put_error("SDL could not be initialized! SDL_Error: ");
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+		success = put_error("SDL could not be initialized! SDL Error: ");
+	else if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024))
+		success = put_error("SDL_mixer could not be initialized! Error: ");
 	else
 	{
 		*window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED,
@@ -68,7 +70,8 @@ int		**read_map(char *str, int w, int h)
 	return (map);
 }
 
-void	update(SDL_Renderer *renderer, int **world_map, SDL_Texture *texture)
+void	update(SDL_Renderer *renderer, int **world_map, SDL_Texture *texture,
+				Mix_Music *music)
 {
 	t_ray		ray;
 	t_player	player;
@@ -80,7 +83,7 @@ void	update(SDL_Renderer *renderer, int **world_map, SDL_Texture *texture)
 	SDL_RenderClear(renderer);
 	init_player(&player);
 	x = 0;
-	while (!done(true, true))
+	while (!done(true, true, music))
 	{
 		x = 0;
 		while (x < SCREEN_WIDTH)
@@ -134,7 +137,7 @@ int		main(int argc, char **argv)
 	{
 		set_boundary(&world_map[0], MAP_WIDTH, MAP_HEIGHT);
 		if (init_window("Wolf3D", &window, &renderer, &texture))
-			update(renderer, world_map, texture);
+			update(renderer, world_map, texture, Mix_LoadMUS("lil_8-bit.wav"));
 	}
 	end(window, renderer, world_map);
 	return (0);

@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   wolf3d.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: drosa-ta <drosa-ta@student.42.us.or>       +#+  +:+       +#+        */
+/*   By: drosa-ta <drosa-ta@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/02/12 01:15:30 by drosa-ta          #+#    #+#             */
-/*   Updated: 2018/02/12 01:15:32 by drosa-ta         ###   ########.fr       */
+/*   Updated: 2018/04/25 00:24:48 by drosa-ta         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef WOLF3D_H
 # define WOLF3D_H
 # include <SDL2/SDL.h>
+# include <SDL2/SDL_mixer.h>
 # include <fcntl.h>
 # include <stdbool.h>
 # include <stdlib.h>
@@ -71,7 +72,7 @@ void			draw_screen(SDL_Renderer *ren, Uint32 **buff, SDL_Texture *tex);
 void			set_player_pos(t_player *player, int **world_map);
 bool			put_error(char *str);
 bool			is_input_key(SDL_Keycode key);
-bool			done(bool quit_if_esc, bool delay);
+bool			done(bool quit_if_esc, bool delay, Mix_Music *music);
 char			*ft_file_to_str(const char *file_name);
 double			get_frametime(void);
 void			set_boundary(int **map, int w, int h);
